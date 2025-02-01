@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        #game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+            display: inline-block;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #feedback, #attempts, #best-score {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Guessing Game</h1>
+    <div id="game-container">
+        <p>Please enter your guess (1 to 100):</p>
+        <input type="number" id="guess" min="1" max="100">
+        <button onclick="checkGuess()" id="submit-btn">Submit Guess</button>
+        <button onclick="resetGame()" class="hidden" id="reset-btn">Play Again</button>
+        <div id="feedback"></div>
+        <div id="attempts"></div>
+        <div id="best-score"></div>
+    </div>
+
+    <script>
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+        let bestScore = localStorage.getItem("bestScore") || Infinity;
+        document.getElementById("best-score").innerText = bestScore !== Infinity ? "Best Score: " + bestScore + " attempts" : "Best Score: N/A";
+
+        function checkGuess() {
+            let guessInput = document.getElementById("guess");
+            let guess = parseInt(guessInput.value);
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById("feedback").innerText = "Please enter a valid number between 1 and 100.";
+                return;
+            }
+            attempts++;
+            if (guess < randomNumber) {
+                document.getElementById("feedback").innerText = guess >= randomNumber - 5 ? "You're very close! Try a slightly bigger number." : "Guess a larger number.";
+            } else if (guess > randomNumber) {
+                document.getElementById("feedback").innerText = guess <= randomNumber + 5 ? "You're very close! Try a slightly smaller number." : "Guess a smaller number.";
+            } else {
+                document.getElementById("feedback").innerText = "🎉 Congratulations! You guessed the number!";
+                document.getElementById("attempts").innerText = "You guessed it in " + attempts + " attempts.";
+                if (attempts < bestScore) {
+                    localStorage.setItem("bestScore", attempts);
+                    document.getElementById("best-score").innerText = "Best Score: " + attempts + " attempts";
+                }
+                document.getElementById("guess").disabled = true;
+                document.getElementById("submit-btn").disabled = true;
+                document.getElementById("reset-btn").classList.remove("hidden");
+            }
+            guessInput.value = "";
+        }
+
+        function resetGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("attempts").innerText = "";
+            document.getElementById("guess").disabled = false;
+            document.getElementById("submit-btn").disabled = false;
+            document.getElementById("reset-btn").classList.add("hidden");
+        }
+    </script>
+
+    <footer>
+        <p>Bye Bye, thanks for playing.</p>
+        <p>Developed by Vaishnavi Thorave</p>
+    </footer>
+</body>
+</html>
